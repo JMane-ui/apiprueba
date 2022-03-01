@@ -1,0 +1,306 @@
+<html>
+  <head>
+    <link rel="shortcut icon" href="https://w7.pngwing.com/pngs/348/162/png-transparent-computer-icons-button-turn-off-ico-miscellaneous-electronics-text.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Instrucciones</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h5>Obtener el ID de Google Sheets</h5>
+        <p>Dentro de tu archivo de Google Sheets, posiciónate en la barra de búsqueda y tu id estará entre
+        <i>/d/</i> y <i>/edit</i>. Como se muestra a continuación:</p>
+        <img src="img/gifInstructions.gif" alt="Instrucciones" width="100%">
+        <hr class="dropdown-divider">
+        <h5>Cómo saber cuándo ya finalizó</h5>
+        <p>Debemos estar atentos al estado, debido a que ahí nos dirá cuando haya terminado el proceso o inclusive si se presentó algún error.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-block" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12 mt-4 d-flex justify-content-end">
+          <a href="https://sheets.new/" target="_blank" class="btn btn-outline-success btn-sm">Crear SpreedSheet</a>
+          <!-- Button trigger modal -->
+          <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Instrucciones
+          </button>
+        </div>
+        <div class="col-12 mt-4" id="formulario">
+          <form action="">
+            <div class="input-group flex-nowrap mb-2">
+              <span class="input-group-text" id="addon-wrapping"><i class="bi-link-45deg"></i></span>
+              <input type="text" name="idSpreed" id="idSpreed" class="form-control" placeholder="ID de hoja Google Sheets" aria-label="ID" aria-describedby="addon-wrapping">
+            </div>
+            <button type="submit" class="btn btn-outline-danger "><i class="bi-table"></i> | Download</button>
+          </form>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12 col-md-3 d-flex justify-content-center">
+          <p>Estado:</p>
+        </div>
+        <div class="col-sm-12 col-md-9 d-flex justify-content-center" id="status">
+
+        </div>
+      </div>
+    </div>
+
+    <!--
+    BEFORE RUNNING:
+    ---------------
+    1. If not already done, enable the Google Sheets API
+       and check the quota for your project at
+       https://console.developers.google.com/apis/api/sheets
+    2. Get access keys for your application. See
+       https://developers.google.com/api-client-library/javascript/start/start-js#get-access-keys-for-your-application
+    3. For additional information on authentication, see
+       https://developers.google.com/sheets/api/quickstart/js#step_2_set_up_the_sample
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script>
+    /*
+    var datos = [
+      {"name": 'raul', "age": 12},
+      {"name": 'juan', "age": 11},
+      {"name": 'jorge', "age": 10},
+      {"name": 'jacinto', "age": 14},
+      {"name": 'leonel', "age": 16},
+      {"name": 'el bicho', "age": 11},
+      {"name": 'jesus', "age": 14},
+      {"name": 'pablo', "age": 10},
+      {"name": 'atsel', "age": 9}
+    ]
+    /*FORMATO
+    var dataStructure = [
+      ['name','12','old'],
+      ['namea','12','old'],
+      ['named','12','old']
+    ]
+    */
+   const status = document.getElementById('status');
+   const optionsGroup = document.getElementById('inputGroupSelect');
+   var opciones = ['posts','comments','albums','photos','todos','users'];
+  
+   function dataString(idSpreed, pages, access_token){
+      //let mod = ['contacts', 'clients', 'projects', 'brands', 'products', 'projectTemplates', 'tasks', 'hours', 'users'];
+        let cadena;
+        let convertir;
+        let myHeaders = new Headers();
+        myHeaders.append("Authorization", `Bearer ${access_token}`);
+
+        let requestOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+        };
+        
+          for(let x = 1; x <= pages; x++){
+            fetch(`https://api.projectcor.com/v1/clients?page=${x}`, requestOptions)
+            .then(response => {
+                response.json()
+                .then(result => {
+                    //console.log(result.data);
+                    //console.log(x);
+                    convertir = JSON.stringify(result.data);
+                    //convertir = convertir.replace(/]/g,"],");
+                    convertir = convertir.replace(/[\[\]']+/g,"");
+                    
+                    cadena += convertir;
+                    
+                    if ((x+1)>pages){
+                      //makeApiCall(idSpreed, cadena);
+                      //console.log("////////Ya tengo los datos");
+                      //console.log(cadena);
+                      let cadenaFD = cadena.replace("undefined","");
+                      cadenaFD = cadenaFD.replace(/}{/g, "},{")
+                      //cadenaFD = cadenaFD.replace(/,,/g, ",")
+                      //console.log('----------------------------------------');
+                      //APLICAR SOLO PARA PROJECTS
+                      let searchProjects = '"collaborators":';
+                      cadenaFD = cadenaFD.replace(new RegExp(searchProjects,"g"),"'collaborators':{");
+                      cadenaFD = '['+cadenaFD+']';
+                      //console.log(cadenaFD);
+                      makeApiCall(idSpreed, cadenaFD);
+                      status.innerHTML = `<p><span class="badge rounded-pill bg-warning">Cargano datos...</span></p>`;
+                    }
+                    
+                })
+                .catch(error => {
+                  status.innerHTML = `<p><span class="badge rounded-pill bg-danger">Se produjo un error, intenta nuevamente</span></p>`;
+                  console.log('error', error)
+                })
+            })  
+            .catch(error => {
+              status.innerHTML = `<p><span class="badge rounded-pill bg-danger">Se produjo un error, intenta nuevamente</span></p>`;
+              console.log('error', error)
+            })
+
+            
+          }
+    }
+
+    function listData(idSpreed, access_token){
+      let pages;
+        let myHeaders = new Headers();
+        myHeaders.append("Authorization", `Bearer ${access_token}`);
+
+        let requestOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+        };
+        
+            fetch(`https://api.projectcor.com/v1/clients`, requestOptions)
+            .then(response => {
+                response.json()
+                .then(result => {
+                    console.log(result);
+                    pages = result.lastPage;
+                    dataString(idSpreed, pages, access_token);
+                    //console.log("//////////PRIMER VALOR ENCONTRADO")
+                })
+                .catch(error => {
+                  console.log('error', error)
+                })
+            })  
+            .catch(error => {
+              console.log('error', error)
+            })
+    }
+    
+    function consumo(idSpreed){
+      let datos = '';
+      let access_token = '';
+      const credentials = 'YjU3ODAzODUtNWVmMi00NjUzLTljNGYtYzUzMDEwZGM4MGQyOmYwZTZlYjZkODM1YzNmOTFiNTEzMjBjMjdhMGQ3YTlh';
+
+      let myHeaders = new Headers();
+      myHeaders.append("Authorization", `basic ${credentials}`);
+
+      let formdata = new FormData();
+
+      let requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: formdata,
+        redirect: 'follow'
+      };
+
+      fetch("https://api.projectcor.com/v1/oauth/token?grant_type=client_credentials", requestOptions)
+      .then(response => {
+          response.json()
+          .then(result => {
+              access_token = result.access_token;
+              listData(idSpreed,access_token);
+          })
+          .catch(error => console.log('error', error))
+      })
+      .catch(error => console.log('error', error))
+    }
+    
+
+    function makeApiCall(idSpreed, datos) {
+      let headers = [];
+      //var idSpreed = prompt('Ingresa el id del Spreed');
+      var params = {
+        // The ID of the spreadsheet to update.
+        spreadsheetId: idSpreed,  // TODO: Update placeholder value.
+      };
+
+      let cadena = datos.replace(/"/g,"'")
+      let concatenar = '=ImportJSON("'+cadena+'")';
+      console.log(concatenar);
+      headers[0] = [concatenar];
+      
+
+      //console.log(dataStructure);
+      //console.log(headers)
+
+      var batchUpdateValuesRequestBody = {
+        // How the input data should be interpreted.
+        valueInputOption: 'USER_ENTERED',  // TODO: Update placeholder value.
+
+        // The new values to apply to the spreadsheet.
+        data: [
+          {
+            'range': 'A1',
+            'majorDimension': 'DIMENSION_UNSPECIFIED',
+            'values': headers
+          }
+        ],  // TODO: Update placeholder value.
+          
+        // TODO: Add desired properties to the request body.
+      };
+
+      var request = gapi.client.sheets.spreadsheets.values.batchUpdate(params, batchUpdateValuesRequestBody);
+      request.then(function(response) {
+        // TODO: Change code below to process the `response` object:
+        console.log(response.result);
+        status.innerHTML = `<p><span class="badge rounded-pill bg-success">Terminado con éxito</span></p>`;
+      }, function(reason) {
+        console.error('error: ' + reason.result.error.message);
+        status.innerHTML = `<p><span class="badge rounded-pill bg-danger">Se produjo un error, verifica los datos e intenta nuevamente</span></p>`;
+      });
+    }
+
+    function initClient() {
+      var API_KEY = 'AIzaSyCZWAmvgUkQTSEcWvtqXud2XMwPP9NaC1w';  // TODO: Update placeholder with desired API key.
+
+      var CLIENT_ID = '843942108617-k1ccq0sqpbs6bej0alh1aem6266vr6n1.apps.googleusercontent.com';  // TODO: Update placeholder with desired client ID.
+
+      // TODO: Authorize using one of the following scopes:
+      var SCOPE = 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets';
+
+      gapi.client.init({
+        'apiKey': API_KEY,
+        'clientId': CLIENT_ID,
+        'scope': SCOPE,
+        'discoveryDocs': ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+      }).then(function() {
+        gapi.auth2.getAuthInstance().isSignedIn.listen(updateSignInStatus);
+        updateSignInStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+      });
+    }
+
+    function handleClientLoad() {
+      gapi.load('client:auth2', initClient);
+    }
+
+    function viewForm(){
+      
+      addEventListener('submit',e => {
+        let spreed = document.getElementById('idSpreed').value;
+        //console.log(valueSelected);
+        status.innerHTML = `<p><span class="badge rounded-pill bg-warning">La hoja ${spreed} se ha enviado</span></p>`;
+        consumo(spreed);
+        //makeApiCall(spreed);
+        e.preventDefault();
+      })
+    }
+
+    function updateSignInStatus(isSignedIn) {
+      if (isSignedIn) {
+        viewForm();
+      }
+    }
+    </script>
+    <script async defer src="https://apis.google.com/js/api.js"
+      onload="this.onload=function(){};handleClientLoad()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script>
+  </body>
+</html>
